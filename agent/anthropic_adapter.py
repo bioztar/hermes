@@ -278,7 +278,6 @@ _FAST_MODE_BETA = "fast-mode-2026-02-01"
 # Additional beta headers required for OAuth/subscription auth.
 # Matches what Claude Code (and pi-ai / OpenCode) send.
 _OAUTH_ONLY_BETAS = [
-    "claude-code-20250219",
     "oauth-2025-04-20",
 ]
 
@@ -749,8 +748,6 @@ def build_anthropic_client(
         kwargs["auth_token"] = api_key
         kwargs["default_headers"] = {
             "anthropic-beta": ",".join(all_betas),
-            "user-agent": f"claude-cli/{_get_claude_code_version()}",
-            "x-app": "cli",
         }
     else:
         # Regular API key → x-api-key header + common betas
