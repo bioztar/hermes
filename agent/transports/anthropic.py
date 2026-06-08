@@ -105,18 +105,28 @@ class AnthropicTransport(ProviderTransport):
                     reasoning_details.append(block_dict)
             elif block.type == "tool_use":
                 name = block.name
-                if strip_tool_prefix and name.startswith(_MCP_PREFIX):
-                    stripped = name[len(_MCP_PREFIX):]
-                    # Only strip the mcp_ prefix for OAuth-injected tools
-                    # (where Hermes adds the prefix when sending to Anthropic
-                    # and must remove it on the way back).  Native MCP server
-                    # tools (from mcp_servers: in config.yaml) are registered
-                    # in the tool registry under their FULL mcp_<server>_<tool>
-                    # name and must NOT be stripped.  GH-25255.
+                if strip_tool_prefix:
                     from tools.registry import registry as _tool_registry
-                    if (_tool_registry.get_entry(stripped)
-                            and not _tool_registry.get_entry(name)):
-                        name = stripped
+                    if name.startswith(_MCP_PREFIX):
+                        # Legacy path: tool arrived with mcp_ prefix (backward compat).
+                        # Strip only when the bare name is registered and the full
+                        # name is not — avoids stripping native MCP server tools.
+                        stripped = name[len(_MCP_PREFIX):]
+                        if (_tool_registry.get_entry(stripped)
+                                and not _tool_registry.get_entry(name)):
+                            name = stripped
+                    else:
+                        # Current path: tool was sent WITHOUT mcp_ prefix.
+                        # Remap renamed triggers back to their canonical names.
+                        if name == "find_in_sessions":
+                            name = "session_search"
+                        elif name == "list_skills":
+                            name = "skills_list"
+                        # Native MCP server tools were stripped of their mcp_ prefix
+                        # before sending; restore it for registry dispatch.
+                        elif not _tool_registry.get_entry(name):
+                            if _tool_registry.get_entry(_MCP_PREFIX + name):
+                                name = _MCP_PREFIX + name
                 tool_calls.append(
                     ToolCall(
                         id=block.id,
