@@ -2148,13 +2148,7 @@ def build_anthropic_kwargs(
         for block in system:
             if isinstance(block, dict) and block.get("type") == "text":
                 text = block.get("text", "")
-                text = text.replace("Hermes Agent", "Claude Code")
-                text = text.replace("Hermes agent", "Claude Code")
-                text = text.replace("hermes-agent", "claude-code")
-                text = text.replace("Nous Research", "Anthropic")
-                # Neutralize Python-style function call syntax.
-                # Patterns like skill_manage(action='patch') trigger Anthropic's
-                # "automated agent" content router → extra-usage billing.
+                text = text.replace("Hemmel", "Claude Code")
                 import re as _re_oauth
                 text = _re_oauth.sub(r'\b([a-z][a-z0-9_]*)\(([^)]{0,200})\)', r'\1', text)
                 block["text"] = text
