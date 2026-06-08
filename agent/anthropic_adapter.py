@@ -749,7 +749,7 @@ def build_anthropic_client(
         kwargs["auth_token"] = api_key
         kwargs["default_headers"] = {
             "anthropic-beta": ",".join(all_betas),
-            "user-agent": f"claude-cli/{_get_claude_code_version()} (external, cli)",
+            "user-agent": f"claude-cli/{_get_claude_code_version()}",
             "x-app": "cli",
         }
     else:
@@ -945,7 +945,7 @@ def refresh_anthropic_oauth_pure(refresh_token: str, *, use_json: bool = False) 
             data=data,
             headers={
                 "Content-Type": content_type,
-                "User-Agent": f"claude-cli/{_get_claude_code_version()} (external, cli)",
+                "User-Agent": f"claude-cli/{_get_claude_code_version()}",
             },
             method="POST",
         )
@@ -1291,7 +1291,7 @@ def run_hermes_oauth_login_pure() -> Optional[Dict[str, Any]]:
             data=exchange_data,
             headers={
                 "Content-Type": "application/json",
-                "User-Agent": f"claude-cli/{_get_claude_code_version()} (external, cli)",
+                "User-Agent": f"claude-cli/{_get_claude_code_version()}",
             },
             method="POST",
         )
